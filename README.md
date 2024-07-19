@@ -13,7 +13,7 @@ For example (not to scale):
 22.1 23.3 22.2 25.3 26.7 26.5 23.9 26.3 22.2 23.3
 
 ## Requirements:
-- Render your root component to the `root` <div> provided below.
+- Render your root component to the `root` <<div>> provided below.
 - No external CSS or JavaScript should be imported besides the React and
   ReactDOM libraries already included below.
 - Include all of your CSS and JavaScript in this file in the <style> and
