@@ -1,0 +1,206 @@
+<!--
+# JobTread Frontend Exercise
+
+The goal of this exercise is to create a live health check dashboard for the
+JobTread API. The dashboard should show the API version and a bar chart of the
+last 10 response times (in milliseconds) of simple GET requests to
+https://api.jobtread.com/healthz, updated every second.
+
+For example (not to scale):
+
+          JobTread API Version abc123
+
+               ---- ---- ----      ----
+     ----      ---- ---- ---- ---- ----      ----
+---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+22.1 23.3 22.2 25.3 26.7 26.5 23.9 26.3 22.2 23.3
+
+Requirements:
+- Render your root component to the `root` <div> provided below.
+- No external CSS or JavaScript should be imported besides the React and
+  ReactDOM libraries already included below.
+- Include all of your CSS and JavaScript in this file in the <style> and
+  <script> tags below.
+- The entirety of the completed exercise should be contained in this file.
+- The dashboard should run correctly in the latest version of Chrome when served
+  from the file protocol. Other browsers do not need to be tested for this
+  exercise.
+- The dashboard should be responsive to different screen widths.
+- Feel free to present the data in additional ways as well, if you choose.
+- Your submission will be evaluated on both visual design and code quality.
+-->
+
+<!doctype html>
+<meta charset='utf-8'>
+<title>JobTread Frontend Exercise</title>
+<script
+  src='https://unpkg.com/react@18/umd/react.development.js'
+  crossorigin
+></script>
+<script
+  src='https://unpkg.com/react-dom@18/umd/react-dom.development.js'
+  crossorigin
+></script>
+
+<div id='title'></div>
+<div id='root'></div>
+
+<style>
+  body {
+    font-family: "Lato", sans-serif;
+    font-size: 16px;
+    min-width: 550px;
+    background-color: #e4e4e1;
+  }
+
+  #title {
+    padding: 15px;
+    text-align: center;
+  }
+
+  #root {
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  svg {
+    display: block;
+    margin: auto;
+  }
+  
+  .bar-group .name-label {
+    text-anchor: end;
+    font-weight: 300;
+    font-size: 1em;
+    fill: #333;
+  }
+
+  .bar-group .value-label {
+    text-anchor: end;
+    fill: #fff;
+    font-weight: 900;
+    font-size: 0.7em;
+  }
+
+  .container .bar-group {
+    transition: opacity 0.3s;
+  }
+
+  /* Fade bars when the chart is hovered */
+  .container:hover .bar-group {
+    opacity: 0.3;
+  }
+
+  /* But don't fade the hovered bar... */
+  .container .bar-group:hover {
+    opacity: 1;
+  }
+
+  .container .bar-group:hover .name-label {
+    font-weight: 400;
+  }
+
+  .container .bar-group:hover .value-label {
+    font-size: 0.8em;
+  }
+
+  @media only screen and (max-width: 570px) {
+    /* For mobile phones: */
+    [class*="body"] {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const apiUrl = "https://api.jobtread.com/healthz"
+  let title = document.getElementById('title');
+
+  /*--Get the API verison--*/
+  fetch(apiUrl)
+  .then(response => {
+    if(!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    title.innerHTML += "<h2>JobTread API Version " + data.version + "</h>";
+  })
+  .catch(error => {
+    console.error('There was a problem with the fetch operation: ', error);
+  });
+
+  /*--Send a GET request every 1 second to update the dashboard--*/
+  var datas = [];
+  var size = 0;
+  setInterval(() => {
+    // GET request 
+    const start = performance.now();
+    fetch(apiUrl)
+    .then(response => {
+      if(!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation: ', error);
+    });
+
+    const end = performance.now();
+    const responseTimeMs = end - start;
+
+    datas.push({
+      name: responseTimeMs.toFixed(2),
+      value: responseTimeMs
+    });
+    size++;
+    console.log(`Response Time: ${responseTimeMs} ms`);
+
+    if (size > 10) {
+      datas.shift();
+      size--;
+    }
+
+    // Update the dashboard
+    ReactDOM.render(React.createElement(BarChart, null),document.getElementById('root'));
+  }, 1000);
+
+  /*--Display data in a bar chart--*/
+  function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}function BarGroup(props) {
+    let barPadding = 2;
+    let barColour = '#348AA7';
+    let heightScale = d => d * 100;
+
+    let height = heightScale(props.d.value);
+    let xMid = props.barWidth * 0.9;
+
+    return /*#__PURE__*/React.createElement("g", { className: "bar-group" }, /*#__PURE__*/
+    React.createElement("text", { className: "name-label", x: xMid, y: "0", alignmentBaseline: "middle" }, props.d.name), /*#__PURE__*/
+    React.createElement("rect", { x: barPadding * 0.5, y: "20", width: props.barWidth - barPadding, height: height, fill: barColour })); /*#__PURE__*/
+
+  }
+
+  class BarChart extends React.Component {constructor(...args) {super(...args);_defineProperty(this, "state", 
+    {data: datas});}
+    render() {
+      let barWidth = 40;
+
+      let barGroups = this.state.data.map((d, i) => /*#__PURE__*/React.createElement("g", { transform: `translate(${i * barWidth}, 0)` }, /*#__PURE__*/
+      React.createElement(BarGroup, { d: d, barWidth: barWidth })));
+
+      return /*#__PURE__*/React.createElement("svg", { width: "400", height: "500" }, /*#__PURE__*/
+      React.createElement("g", { className: "container" }, /*#__PURE__*/
+      React.createElement("g", { className: "chart", transform: "translate(0, 20)" },
+      barGroups)));
+
+    }}
+
+
+  ReactDOM.render(React.createElement(BarChart, null),document.getElementById('root'));
+</script>
