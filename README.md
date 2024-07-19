@@ -3,7 +3,7 @@
 The goal of this exercise is to create a live health check dashboard for the JobTread API. The dashboard should show the API version and a bar chart of the last 10 response times (in milliseconds) of simple GET requests to https://api.jobtread.com/healthz, updated every second.
 
 For example (not to scale):
-
+`
           JobTread API Version abc123
 
                ---- ---- ----      ----
@@ -13,7 +13,7 @@ For example (not to scale):
 ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 22.1 23.3 22.2 25.3 26.7 26.5 23.9 26.3 22.2 23.3
-
+`
 ## Requirements:
 - Render your root component to the `root` <div> provided below.
 - No external CSS or JavaScript should be imported besides the React and
